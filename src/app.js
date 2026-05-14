@@ -20,10 +20,16 @@ async function fetchShifts() {
     } catch (error) {
         console.error('Error fetching shifts:', error);
         loadingElement.innerHTML = `
-            <div style="color: #e74c3c; padding: 20px; text-align: center;">
-                <p><strong>เกิดข้อผิดพลาดในการเชื่อมต่อ (CORS Error)</strong></p>
-                <p style="font-size: 0.9rem;">ลีนุกส์แนะนำให้คุณบีมลองเปิดหน้าเว็บผ่าน <strong>VS Code Live Server</strong> นะคะ <br> 
-                การเปิดไฟล์ HTML ตรงๆ ในเครื่อง (file://) มักจะถูก Browser บล็อกความปลอดภัยค่ะ</p>
+            <div style="color: #e74c3c; padding: 20px; text-align: center; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <p><strong>🏥 ไม่สามารถดึงข้อมูลจาก Google Sheets ได้</strong></p>
+                <p style="font-size: 0.9rem; color: #666;">อาจเกิดจาก Google Apps Script ยังไม่ได้รับอนุญาตให้เข้าถึงแบบสาธารณะค่ะ</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="font-size: 0.85rem; text-align: left;"><strong>วิธีแก้ไขสำหรับคุณบีม:</strong><br>
+                1. ไปที่หน้า Google Apps Script<br>
+                2. กด <strong>Deploy > Manage Deployments</strong><br>
+                3. กดแก้ไข (รูปดินสอ) เลือก Version เป็น <strong>New Version</strong><br>
+                4. ตรวจสอบว่า Who has access เป็น <strong>Anyone</strong> (สำคัญมากค่ะ!)<br>
+                5. กด Deploy แล้วลองรีเฟรชหน้านี้อีกรอบนะค</p>
             </div>
         `;
     }
