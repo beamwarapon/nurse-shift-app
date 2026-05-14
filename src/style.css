@@ -1,91 +1,141 @@
 :root {
-    --primary-color: #f0f4f8;
-    --accent-color: #3498db;
-    --text-color: #2c3e50;
-    --bg-color: #ffffff;
-    --card-bg: #ffffff;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Colors inspired by Cal.com & Linear */
+    --canvas: #ffffff;
+    --surface-card: #f5f5f5;
+    --primary: #111111;
+    --text-main: #111111;
+    --text-body: #374151;
+    --text-muted: #6b7280;
+    --hairline: #e5e7eb;
+    
+    /* Shift Specific Colors */
+    --morning-bg: #e8f5e9;
+    --morning-text: #10b981;
+    --afternoon-bg: #fff3e0;
+    --afternoon-text: #f59e0b;
+    --night-bg: #eef2ff;
+    --night-text: #5e6ad2;
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--primary-color);
-    color: var(--text-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--canvas);
+    color: var(--text-main);
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    line-height: 1.5;
 }
 
 header {
-    width: 100%;
-    padding: 2rem 0;
-    text-align: center;
-    background-color: var(--bg-color);
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 2rem;
+    text-align: left;
 }
 
 h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.04em;
     margin: 0;
-    font-size: 2rem;
-    color: var(--accent-color);
+    color: var(--text-main);
+}
+
+header p {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
 }
 
 main {
-    width: 90%;
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
 }
 
 .loading {
+    padding: 4rem;
     text-align: center;
-    font-size: 1.2rem;
-    margin-top: 2rem;
+    color: var(--text-muted);
+    font-weight: 500;
 }
 
 .shift-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
-    padding: 1rem;
 }
 
 .shift-card {
-    background-color: var(--card-bg);
-    border-radius: 10px;
+    background-color: var(--canvas);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .shift-card:hover {
-    transform: translateY(-5px);
+    border-color: var(--text-muted);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
-.shift-card h3 {
-    margin-top: 0;
-    color: var(--accent-color);
+.shift-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
-.shift-card p {
-    margin: 0.5rem 0;
+.nurse-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.shift-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0.25rem 0 1rem;
 }
 
 .shift-type {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.shift-morning { background-color: #e8f5e9; color: #2e7d32; }
-.shift-afternoon { background-color: #fff3e0; color: #ef6c00; }
-.shift-night { background-color: #ede7f6; color: #4527a0; }
+.shift-morning { background-color: var(--morning-bg); color: var(--morning-text); }
+.shift-afternoon { background-color: var(--afternoon-bg); color: var(--afternoon-text); }
+.shift-night { background-color: var(--night-bg); color: var(--night-text); }
 
-@media (max-width: 600px) {
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    header {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+    h1 {
+        font-size: 2rem;
+    }
     .shift-grid {
         grid-template-columns: 1fr;
     }

@@ -51,12 +51,33 @@ function renderShifts(shifts) {
         const shiftClass = getShiftClass(shift.ShiftType);
 
         card.innerHTML = `
-            <h3>${shift.Name}</h3>
-            <p><strong>วันที่:</strong> ${shift.Date}</p>
-            <p><strong>เวร:</strong> <span class="shift-type ${shiftClass}">${shift.ShiftType}</span></p>
+            <div>
+                <div class="shift-header">
+                    <h3 class="nurse-name">${shift.Name}</h3>
+                </div>
+                <p class="shift-date">${formatDate(shift.Date)}</p>
+            </div>
+            <div>
+                <span class="shift-type ${shiftClass}">${shift.ShiftType}</span>
+            </div>
         `;
         container.appendChild(card);
     });
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('th-TH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+    } catch (e) {
+        return dateString;
+    }
 }
 
 function getShiftClass(type) {
