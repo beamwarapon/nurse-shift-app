@@ -1,0 +1,92 @@
+:root {
+    --primary-color: #f0f4f8;
+    --accent-color: #3498db;
+    --text-color: #2c3e50;
+    --bg-color: #ffffff;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    padding: 2rem 0;
+    text-align: center;
+    background-color: var(--bg-color);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--accent-color);
+}
+
+main {
+    width: 90%;
+    max-width: 1200px;
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+}
+
+.shift-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.shift-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+}
+
+.shift-card:hover {
+    transform: translateY(-5px);
+}
+
+.shift-card h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
+
+.shift-card p {
+    margin: 0.5rem 0;
+}
+
+.shift-type {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.shift-morning { background-color: #e8f5e9; color: #2e7d32; }
+.shift-afternoon { background-color: #fff3e0; color: #ef6c00; }
+.shift-night { background-color: #ede7f6; color: #4527a0; }
+
+@media (max-width: 600px) {
+    .shift-grid {
+        grid-template-columns: 1fr;
+    }
+}
