@@ -50,36 +50,54 @@ function doPost(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const action = postData.action;
 
+    // --- Action: Add Staff ---
     if (action === "addStaff") {
-      const sheet = ss.getSheetByName("Staff");
+      let sheet = ss.getSheetByName("Staff");
+      if (!sheet) {
+        sheet = ss.insertSheet("Staff");
+        sheet.appendRow(["ID", "Name", "Role", "Department"]);
+      }
       const id = Utilities.getUuid();
       sheet.appendRow([id, postData.Name, postData.Role, postData.Department]);
       return ContentService.createTextOutput(JSON.stringify({ status: "success", id: id }))
         .setMimeType(ContentService.MimeType.JSON);
     } 
     
-    if (action === "deleteStaff") {
+    // --- Action: Delete Staff ---
+    else if (action === "deleteStaff") {
       const sheet = ss.getSheetByName("Staff");
+      if (!sheet) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Staff sheet not found" })).setMimeType(ContentService.MimeType.JSON);
+      
       const data = sheet.getDataRange().getValues();
+      let deleted = false;
       for (let i = 1; i < data.length; i++) {
         if (data[i][0] === postData.ID) {
           sheet.deleteRow(i + 1);
+          deleted = true;
           break;
         }
       }
-      return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+      return ContentService.createTextOutput(JSON.stringify({ status: deleted ? "success" : "error", message: deleted ? "" : "ID not found" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    if (action === "addShift") {
-      const sheet = ss.getSheetByName("Nurse-Shifts");
+    // --- Action: Add Shift ---
+    else if (action === "addShift") {
+      let sheet = ss.getSheetByName("Nurse-Shifts");
+      if (!sheet) {
+        sheet = ss.insertSheet("Nurse-Shifts");
+        sheet.appendRow(["Name", "Date", "ShiftType"]);
+      }
       sheet.appendRow([postData.Name, postData.Date, postData.ShiftType]);
       return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Unknown action" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    // --- Action: Unknown ---
+    else {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Unknown action: " + action }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
