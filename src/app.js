@@ -1,99 +1,91 @@
-// Version: 1.0.2 - Updated API URL and added cache buster
+// Version: 1.1.0 - Calendar View Implementation
 const API_URL = 'https://script.google.com/macros/s/AKfycbweEF2IYbkDBS__ivHwOFlfChtYE1HMf1Vg5M7sL46_pi24-jHUJi3yM5VHm_IUS_tf/exec';
+
+let currentDate = new Date();
+let allShifts = [];
 
 async function fetchShifts() {
     const loadingElement = document.getElementById('loading');
-    const container = document.getElementById('shift-container');
-
     try {
-        // เพิ่ม timestamp เพื่อป้องกัน cache ของ browser
         const finalUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-        
         const response = await fetch(finalUrl, {
             method: 'GET',
-            mode: 'cors', // เพิ่มโหมด cors ให้ชัดเจน
+            mode: 'cors',
             credentials: 'omit'
         });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
 
-        const shifts = await response.json();
-
+        allShifts = await response.json();
         loadingElement.style.display = 'none';
-        renderShifts(shifts);
+        renderCalendar();
     } catch (error) {
         console.error('Error fetching shifts:', error);
-        loadingElement.innerHTML = `
-            <div style="color: #e74c3c; padding: 20px; text-align: center; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <p><strong>🏥 ไม่สามารถดึงข้อมูลจาก Google Sheets ได้</strong></p>
-                <p style="font-size: 0.9rem; color: #666;">อาจเกิดจาก Google Apps Script ยังไม่ได้รับอนุญาตให้เข้าถึงแบบสาธารณะค่ะ</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="font-size: 0.85rem; text-align: left;"><strong>วิธีแก้ไขสำหรับคุณบีม:</strong><br>
-                1. ไปที่หน้า Google Apps Script<br>
-                2. กด <strong>Deploy > Manage Deployments</strong><br>
-                3. กดแก้ไข (รูปดินสอ) เลือก Version เป็น <strong>New Version</strong><br>
-                4. ตรวจสอบว่า Who has access เป็น <strong>Anyone</strong> (สำคัญมากค่ะ!)<br>
-                5. กด Deploy แล้วลองรีเฟรชหน้านี้อีกรอบนะค</p>
-            </div>
-        `;
+        loadingElement.innerHTML = `<div class="error-msg">ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อ</div>`;
     }
 }
-function renderShifts(shifts) {
-    const container = document.getElementById('shift-container');
-    container.innerHTML = '';
 
-    shifts.forEach(shift => {
-        const card = document.createElement('div');
-        card.className = 'shift-card';
-
-        const shiftClass = getShiftClass(shift.ShiftType);
-
-        card.innerHTML = `
-            <div>
-                <div class="shift-header">
-                    <h3 class="nurse-name">${shift.Name}</h3>
-                </div>
-                <p class="shift-date">${formatDate(shift.Date)}</p>
-            </div>
-            <div>
-                <span class="shift-type ${shiftClass}">${shift.ShiftType}</span>
-            </div>
-        `;
-        container.appendChild(card);
+function renderCalendar() {
+    const grid = document.getElementById('calendar-grid');
+    const monthDisplay = document.getElementById('currentMonth');
+    
+    grid.innerHTML = '';
+    
+    // Set Header
+    const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+    days.forEach(day => {
+        const dayHead = document.createElement('div');
+        dayHead.className = 'calendar-day-head';
+        dayHead.textContent = day;
+        grid.appendChild(dayHead);
     });
-}
 
-function formatDate(dateString) {
-    if (!dateString) return '';
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('th-TH', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    monthDisplay.textContent = new Intl.DateTimeFormat('th-TH', { month: 'long', year: 'numeric' }).format(currentDate);
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Fill empty cells for previous month
+    for (let i = 0; i < firstDay; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell other-month';
+        grid.appendChild(cell);
+    }
+
+    // Fill actual days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+        
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = new Date().toISOString().split('T')[0] === dateStr;
+
+        cell.innerHTML = `<span class="day-number ${isToday ? 'today' : ''}">${day}</span>`;
+
+        // Find shifts for this day
+        const dayShifts = allShifts.filter(s => s.Date === dateStr);
+        dayShifts.forEach(shift => {
+            const shiftDiv = document.createElement('div');
+            shiftDiv.className = `shift-item ${shift.ShiftType}`;
+            shiftDiv.textContent = `${shift.Name}: ${shift.ShiftType}`;
+            cell.appendChild(shiftDiv);
         });
-    } catch (e) {
-        return dateString;
+
+        grid.appendChild(cell);
     }
 }
 
-function getShiftClass(type) {
-    switch (type.toLowerCase()) {
-        case 'เช้า':
-        case 'morning':
-            return 'shift-morning';
-        case 'บ่าย':
-        case 'afternoon':
-            return 'shift-afternoon';
-        case 'ดึก':
-        case 'night':
-            return 'shift-night';
-        default:
-            return '';
-    }
-}
+document.getElementById('prevMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+});
+
+document.getElementById('nextMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+});
 
 document.addEventListener('DOMContentLoaded', fetchShifts);

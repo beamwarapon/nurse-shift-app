@@ -70,63 +70,124 @@ main {
     font-weight: 500;
 }
 
-.shift-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.shift-card {
-    background-color: var(--canvas);
-    border: 1px solid var(--hairline);
+/* Calendar Styles */
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: var(--canvas);
+    padding: 1rem;
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    border: 1px solid var(--hairline);
 }
 
-.shift-card:hover {
-    border-color: var(--text-muted);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.shift-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.nurse-name {
-    font-size: 1.25rem;
-    font-weight: 600;
+.calendar-nav h2 {
     margin: 0;
+    font-size: 1.5rem;
     letter-spacing: -0.02em;
 }
 
-.shift-date {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin: 0.25rem 0 1rem;
+.nav-btn {
+    background: var(--canvas);
+    border: 1px solid var(--hairline);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
-.shift-type {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35rem 0.75rem;
-    border-radius: var(--radius-md);
+.nav-btn:hover {
+    background: var(--surface-card);
+    border-color: var(--text-muted);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: var(--hairline);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.calendar-day-head {
+    background-color: var(--surface-card);
+    padding: 1rem;
+    text-align: center;
     font-weight: 600;
     font-size: 0.85rem;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.shift-morning { background-color: var(--morning-bg); color: var(--morning-text); }
-.shift-afternoon { background-color: var(--afternoon-bg); color: var(--afternoon-text); }
-.shift-night { background-color: var(--night-bg); color: var(--night-text); }
+.calendar-cell {
+    background-color: var(--canvas);
+    min-height: 120px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.calendar-cell.other-month {
+    background-color: #fafafa;
+}
+
+.day-number {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    padding: 2px 6px;
+    display: inline-block;
+}
+
+.day-number.today {
+    background-color: var(--primary);
+    color: white;
+    border-radius: 4px;
+}
+
+.shift-item {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 3px solid transparent;
+}
+
+.shift-item.เช้า { background-color: var(--morning-bg); color: var(--morning-text); border-left-color: var(--morning-text); }
+.shift-item.บ่าย { background-color: var(--afternoon-bg); color: var(--afternoon-text); border-left-color: var(--afternoon-text); }
+.shift-item.ดึก { background-color: var(--night-bg); color: var(--night-text); border-left-color: var(--night-text); }
+
+/* Remove old shift-grid styles */
+.shift-grid, .shift-card { display: none; }
+
+@media (max-width: 768px) {
+    .calendar-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .calendar-day-head { display: none; }
+    .calendar-cell {
+        min-height: auto;
+        border-bottom: 1px solid var(--hairline);
+        padding: 1rem;
+    }
+    .day-number {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
