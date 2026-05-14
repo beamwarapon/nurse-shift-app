@@ -1,4 +1,4 @@
-// Version: 1.2.0 - Multi-view & Staff Management
+// Version: 1.3.0 - Add Shift Implementation & Modal
 const API_URL = 'https://script.google.com/macros/s/AKfycbweEF2IYbkDBS__ivHwOFlfChtYE1HMf1Vg5M7sL46_pi24-jHUJi3yM5VHm_IUS_tf/exec';
 
 let currentDate = new Date();
@@ -13,6 +13,9 @@ const viewSubtitle = document.getElementById('view-subtitle');
 const loadingElement = document.getElementById('loading');
 const staffList = document.getElementById('staff-list');
 const addStaffForm = document.getElementById('add-staff-form');
+const addShiftForm = document.getElementById('add-shift-form');
+const shiftModal = document.getElementById('shift-modal');
+const nurseSelect = document.getElementById('shift-nurse-select');
 
 // Navigation
 document.getElementById('show-calendar').addEventListener('click', () => switchView('calendar'));
@@ -42,7 +45,10 @@ async function fetchData() {
     loadingElement.style.display = 'block';
     try {
         const finalUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-        const response = await fetch(finalUrl);
+        const response = await fetch(finalUrl, {
+            method: 'GET',
+            credentials: 'omit'
+        });
         if (!response.ok) throw new Error('Network response was not ok');
 
         const data = await response.json();
@@ -50,11 +56,22 @@ async function fetchData() {
         allStaff = data.staff || [];
         
         loadingElement.style.display = 'none';
+        updateNurseDropdown();
         renderCalendar();
     } catch (error) {
         console.error('Error fetching data:', error);
         loadingElement.innerHTML = `<div class="error-msg">ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อ</div>`;
     }
+}
+
+function updateNurseDropdown() {
+    nurseSelect.innerHTML = '<option value="">-- เลือกชื่อพยาบาล --</option>';
+    allStaff.forEach(staff => {
+        const option = document.createElement('option');
+        option.value = staff.Name;
+        option.textContent = staff.Name;
+        nurseSelect.appendChild(option);
+    });
 }
 
 // Staff Management
@@ -71,6 +88,7 @@ async function addStaff(e) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
+            credentials: 'omit',
             body: JSON.stringify({
                 action: 'addStaff',
                 Name: name,
@@ -81,6 +99,7 @@ async function addStaff(e) {
         const result = await response.json();
         if (result.status === 'success') {
             allStaff.push({ ID: result.id, Name: name, Role: role, Department: dept });
+            updateNurseDropdown();
             renderStaff();
             addStaffForm.reset();
         }
@@ -98,11 +117,13 @@ async function deleteStaff(id) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
+            credentials: 'omit',
             body: JSON.stringify({ action: 'deleteStaff', ID: id })
         });
         const result = await response.json();
         if (result.status === 'success') {
             allStaff = allStaff.filter(s => s.ID !== id);
+            updateNurseDropdown();
             renderStaff();
         }
     } catch (error) {
@@ -122,6 +143,58 @@ function renderStaff() {
         </tr>
     `).join('');
 }
+
+// Shift Management
+async function addShift(e) {
+    e.preventDefault();
+    const name = nurseSelect.value;
+    const date = document.getElementById('shift-date-input').value;
+    const type = document.getElementById('shift-type-select').value;
+
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึก...';
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            credentials: 'omit',
+            body: JSON.stringify({
+                action: 'addShift',
+                Name: name,
+                Date: date,
+                ShiftType: type
+            })
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+            allShifts.push({ Name: name, Date: date, ShiftType: type });
+            renderCalendar();
+            shiftModal.classList.add('hidden');
+            addShiftForm.reset();
+        }
+    } catch (error) {
+        alert('เกิดข้อผิดพลาดในการบันทึกเวร');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'บันทึกเวร';
+    }
+}
+
+// Modal Logic
+document.getElementById('open-add-shift').addEventListener('click', () => {
+    shiftModal.classList.remove('hidden');
+});
+
+document.getElementById('close-modal').addEventListener('click', () => {
+    shiftModal.classList.add('hidden');
+});
+
+window.onclick = (event) => {
+    if (event.target == shiftModal) {
+        shiftModal.classList.add('hidden');
+    }
+};
 
 // Calendar Rendering
 function renderCalendar() {
@@ -184,6 +257,7 @@ document.getElementById('nextMonth').addEventListener('click', () => {
 });
 
 addStaffForm.addEventListener('submit', addStaff);
+addShiftForm.addEventListener('submit', addShift);
 
 // Expose deleteStaff to global scope for onclick
 window.deleteStaff = deleteStaff;

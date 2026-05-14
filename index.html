@@ -28,6 +28,9 @@
     <main>
         <!-- Calendar View -->
         <section id="calendar-view">
+            <div class="calendar-actions">
+                <button id="open-add-shift" class="btn btn-primary">+ เพิ่มเวร</button>
+            </div>
             <div id="calendar-header" class="calendar-nav">
                 <button id="prevMonth" class="nav-btn">&lt;</button>
                 <h2 id="currentMonth">พฤษภาคม 2569</h2>
@@ -37,6 +40,37 @@
                 <!-- Days will be generated here -->
             </div>
         </section>
+
+        <!-- Add Shift Modal -->
+        <div id="shift-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>บันทึกการลงเวร</h3>
+                    <button id="close-modal" class="close-btn">&times;</button>
+                </div>
+                <form id="add-shift-form">
+                    <div class="form-group">
+                        <label for="shift-nurse-select">เลือกเจ้าหน้าที่</label>
+                        <select id="shift-nurse-select" required>
+                            <option value="">-- เลือกชื่อพยาบาล --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="shift-date-input">วันที่</label>
+                        <input type="date" id="shift-date-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shift-type-select">กะการทำงาน</label>
+                        <select id="shift-type-select" required>
+                            <option value="เช้า">เช้า (Morning)</option>
+                            <option value="บ่าย">บ่าย (Afternoon)</option>
+                            <option value="ดึก">ดึก (Night)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">บันทึกเวร</button>
+                </form>
+            </div>
+        </div>
 
         <!-- Staff View -->
         <section id="staff-view" class="hidden">
