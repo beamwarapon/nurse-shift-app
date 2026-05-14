@@ -1,3 +1,4 @@
+// Version: 1.0.2 - Updated API URL and added cache buster
 const API_URL = 'https://script.google.com/macros/s/AKfycbweEF2IYbkDBS__ivHwOFlfChtYE1HMf1Vg5M7sL46_pi24-jHUJi3yM5VHm_IUS_tf/exec';
 
 async function fetchShifts() {
@@ -5,9 +6,12 @@ async function fetchShifts() {
     const container = document.getElementById('shift-container');
 
     try {
-        // ใช้ fetch แบบปกติ แต่เพิ่ม credentials: 'omit' เพื่อแก้ปัญหา CORS กับ Google Apps Script ในบางกรณี
-        const response = await fetch(API_URL, {
+        // เพิ่ม timestamp เพื่อป้องกัน cache ของ browser
+        const finalUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+        
+        const response = await fetch(finalUrl, {
             method: 'GET',
+            mode: 'cors', // เพิ่มโหมด cors ให้ชัดเจน
             credentials: 'omit'
         });
 
