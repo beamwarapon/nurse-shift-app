@@ -3,25 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตารางเวรพยาบาล</title>
+    <title>Nurse Shift App</title>
     <link rel="stylesheet" href="src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">NurseShift</div>
+            <div class="nav-links">
+                <button id="show-calendar" class="nav-link active">ปฏิทินเวร</button>
+                <button id="show-staff" class="nav-link">จัดการเจ้าหน้าที่</button>
+            </div>
+        </div>
+    </nav>
+
     <header>
-        <h1>ตารางเวรพยาบาล</h1>
-        <p>ระบบจัดการและตรวจสอบตารางเวรแบบเรียลไทม์</p>
+        <h1 id="view-title">ตารางเวรพยาบาล</h1>
+        <p id="view-subtitle">ระบบจัดการและตรวจสอบตารางเวรแบบเรียลไทม์</p>
     </header>
+
     <main>
-        <div id="calendar-header" class="calendar-nav">
-            <button id="prevMonth" class="nav-btn">&lt;</button>
-            <h2 id="currentMonth">พฤษภาคม 2569</h2>
-            <button id="nextMonth" class="nav-btn">&gt;</button>
-        </div>
-        <div id="calendar-grid" class="calendar-grid">
-            <!-- วันในสัปดาห์จะถูกสร้างที่นี่ -->
-        </div>
+        <!-- Calendar View -->
+        <section id="calendar-view">
+            <div id="calendar-header" class="calendar-nav">
+                <button id="prevMonth" class="nav-btn">&lt;</button>
+                <h2 id="currentMonth">พฤษภาคม 2569</h2>
+                <button id="nextMonth" class="nav-btn">&gt;</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                <!-- Days will be generated here -->
+            </div>
+        </section>
+
+        <!-- Staff View -->
+        <section id="staff-view" class="hidden">
+            <div class="card staff-card">
+                <div class="card-header">
+                    <h3>เพิ่มเจ้าหน้าที่ใหม่</h3>
+                </div>
+                <form id="add-staff-form" class="staff-form">
+                    <div class="form-group">
+                        <label for="staff-name">ชื่อ-นามสกุล</label>
+                        <input type="text" id="staff-name" required placeholder="ระบุชื่อ">
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-role">ตำแหน่ง</label>
+                        <input type="text" id="staff-role" required placeholder="เช่น พยาบาลวิชาชีพ">
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-dept">แผนก</label>
+                        <input type="text" id="staff-dept" required placeholder="เช่น OPD">
+                    </div>
+                    <button type="submit" class="btn btn-primary">เพิ่มข้อมูล</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>รายชื่อเจ้าหน้าที่</h3>
+                </div>
+                <div class="table-container">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>ตำแหน่ง</th>
+                                <th>แผนก</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-list">
+                            <!-- Staff rows will be generated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <div id="loading" class="loading">กำลังโหลดข้อมูล...</div>
     </main>
+
     <script src="src/app.js"></script>
 </body>
 </html>

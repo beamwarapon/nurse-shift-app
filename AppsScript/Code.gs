@@ -1,41 +1,30 @@
 /**
  * Google Apps Script for Nurse Shift Scheduling App
- * 
- * Setup Instructions:
- * 1. Create a new Google Sheet.
- * 2. Rename the first sheet to "Shifts".
- * 3. Create headers in the first row: "Name", "Date", "ShiftType".
- * 4. Add some sample data below the headers.
- * 5. In the Google Sheet, go to Extensions > Apps Script.
- * 6. Replace the default code with this content.
- * 7. Click "Deploy" > "New deployment".
- * 8. Select type "Web app".
- * 9. Set "Execute as" to "Me" and "Who has access" to "Anyone".
- * 10. Copy the Web App URL and paste it into the `API_URL` constant in `src/app.js`.
  */
 
-function doGet(e) {
+function getSheetData(sheetName) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetName = "Nurse-Shifts";
-  const sheet = ss.getSheetByName(sheetName);
+  let sheet = ss.getSheetByName(sheetName);
   
   if (!sheet) {
-    const allSheetNames = ss.getSheets().map(s => s.getName()).join(", ");
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "error", 
-      message: `ไม่พบ Sheet ที่ชื่อ "${sheetName}" กรุณาตรวจสอบชื่อ Sheet ในไฟล์ของคุณ (ชื่อที่มีในไฟล์ตอนนี้คือ: ${allSheetNames})` 
-    })).setMimeType(ContentService.MimeType.JSON);
+    if (sheetName === "Staff") {
+      sheet = ss.insertSheet("Staff");
+      sheet.appendRow(["ID", "Name", "Role", "Department"]);
+    } else {
+      return null;
+    }
   }
 
   const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+  
   const headers = data[0];
   const rows = data.slice(1);
 
-  const jsonData = rows.map(row => {
+  return rows.map(row => {
     let obj = {};
     headers.forEach((header, i) => {
       let value = row[i];
-      // Format date if it's a Date object
       if (value instanceof Date) {
         value = Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
       }
@@ -43,22 +32,55 @@ function doGet(e) {
     });
     return obj;
   });
+}
 
-  return ContentService.createTextOutput(JSON.stringify(jsonData))
-    .setMimeType(ContentService.MimeType.JSON);
+function doGet(e) {
+  const shifts = getSheetData("Nurse-Shifts") || [];
+  const staff = getSheetData("Staff") || [];
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    shifts: shifts,
+    staff: staff
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   try {
     const postData = JSON.parse(e.postData.contents);
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Nurse-Shifts");
-    
-    // Example: Append a new shift (for simple implementation)
-    // In a real app, you might want to find and update or handle swap requests
-    sheet.appendRow([postData.Name, postData.Date, postData.ShiftType]);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const action = postData.action;
 
-    return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+    if (action === "addStaff") {
+      const sheet = ss.getSheetByName("Staff");
+      const id = Utilities.getUuid();
+      sheet.appendRow([id, postData.Name, postData.Role, postData.Department]);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", id: id }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } 
+    
+    if (action === "deleteStaff") {
+      const sheet = ss.getSheetByName("Staff");
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0] === postData.ID) {
+          sheet.deleteRow(i + 1);
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (action === "addShift") {
+      const sheet = ss.getSheetByName("Nurse-Shifts");
+      sheet.appendRow([postData.Name, postData.Date, postData.ShiftType]);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Unknown action" }))
       .setMimeType(ContentService.MimeType.JSON);
+
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
