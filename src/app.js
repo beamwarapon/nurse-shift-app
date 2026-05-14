@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbx2jtCg7tbkSslyIPh7Vd00r0JSIxZBf5Uxkvj6fSkdq_I-fGyFjucFX9zr2DhBDA3_/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbweEF2IYbkDBS__ivHwOFlfChtYE1HMf1Vg5M7sL46_pi24-jHUJi3yM5VHm_IUS_tf/exec';
 
 async function fetchShifts() {
     const loadingElement = document.getElementById('loading');
