@@ -5,9 +5,11 @@ async function fetchShifts() {
     const container = document.getElementById('shift-container');
 
     try {
-        // ใช้ fetch แบบปกติ แต่ Google Apps Script จะมีการ Redirect (302)
-        // Browser ส่วนใหญ่จะจัดการให้ถ้าเราเรียกผ่าน Server (เช่น Live Server)
-        const response = await fetch(API_URL);
+        // ใช้ fetch แบบปกติ แต่เพิ่ม credentials: 'omit' เพื่อแก้ปัญหา CORS กับ Google Apps Script ในบางกรณี
+        const response = await fetch(API_URL, {
+            method: 'GET',
+            credentials: 'omit'
+        });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
